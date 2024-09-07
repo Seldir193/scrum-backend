@@ -186,3 +186,5 @@ AUTH_USER_MODEL = 'sclist.CustomUser'
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # Standard Backend
 )
+
+APPEND_SLASH = False
