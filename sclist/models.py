@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 class CustomUser(AbstractUser):
-    # Hier können Sie zusätzliche Felder hinzufügen, falls erforderlich
+    
     pass
 
 class Contact(models.Model):

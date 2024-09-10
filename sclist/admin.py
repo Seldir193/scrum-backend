@@ -11,8 +11,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 class ContactAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'phoneNumber')
     search_fields = ('name', 'email', 'phoneNumber')
-    list_filter = ('name',)  # Füge Filter hinzu, falls relevant
-    
+    list_filter = ('name',)  
     
 @admin.register(Todo)
 class TodoAdmin(admin.ModelAdmin):
@@ -43,48 +42,9 @@ class DoneAdmin(admin.ModelAdmin):
     
 
 
-#@admin.register(TodayTask)
-#class TodayTaskAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'user', 'description', 'delayed')
 
 
-#@admin.register(Contact)
-#class ContactAdmin(admin.ModelAdmin):
-    #list_display = ('name', 'email', 'phone_number')
-    #search_fields = ('name', 'email')
-
-#@admin.register(Todo)
-#class TodoAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'delayed', 'order', 'user', 'description')
-    #search_fields = ('text', 'description')
-    #list_filter = ('delayed', 'user')
-    #ordering = ('order',)
 
 
     
     
-#@admin.register(Todo)
-#class TodoAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'delayed', 'user', 'description')
-    #search_fields = ('text', 'description')
-    #list_filter = ('delayed', 'user')
-
-#@admin.register(TodayTask)
-#class TodayTaskAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'delayed', 'user', 'description')
-    #search_fields = ('text', 'description')
-    #list_filter = ('delayed', 'user')
-
-#@admin.register(InProgress)
-#class InProgressAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'delayed', 'user', 'description')
-    #search_fields = ('text', 'description')
-    #list_filter = ('delayed', 'user')
-
-#@admin.register(Done)
-#class DoneAdmin(admin.ModelAdmin):
-    #list_display = ('text', 'delayed', 'user', 'description')
-    #search_fields = ('text', 'description')
-    #list_filter = ('delayed', 'user')
-
-

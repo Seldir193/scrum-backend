@@ -1,4 +1,3 @@
-
 from django.http import Http404
 from rest_framework import status 
 from rest_framework.response import Response
@@ -73,49 +72,15 @@ class TodoViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         
     def get_queryset(self):
-       return Todo.objects.filter(user=self.request.user)
+        return Todo.objects.filter(user=self.request.user)
 
-        
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
-        
-    def destroy(self, request, *args, **kwargs):
-        try:
-            todo = self.get_object()
-            todo.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Todo.DoesNotExist:
-            return Response({"error": "Todo not found."}, status=status.HTTP_404_NOT_FOUND)
-  
-        
-        
-class TodayTaskViewSet(viewsets.ModelViewSet):
-    queryset = TodayTask.objects.all()
-    serializer_class = TodayTaskSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def perform_destroy(self, instance):
+        instance.delete()
     
-    def get_queryset(self):
-        return TodayTask.objects.filter(user=self.request.user)
-    
-    
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-        
-    def destroy(self, request, pk=None):
-        try:
-            task = self.get_object()
-            task.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except TodayTask.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        
-   
-        
+
 class InProgressViewSet(viewsets.ModelViewSet):
     queryset = InProgress.objects.all()
     serializer_class = InProgressSerializer
@@ -127,16 +92,13 @@ class InProgressViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         return InProgress.objects.filter(user=self.request.user)
-    
-            
-    def destroy(self, request, pk=None):
-        try:
-            InProgress = self.get_object()
-            InProgress.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except InProgress.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
 class DoneViewSet(viewsets.ModelViewSet):
     queryset = Done.objects.all()
     serializer_class = DoneSerializer
@@ -148,115 +110,31 @@ class DoneViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         return Done.objects.filter(user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+class TodayTaskViewSet(viewsets.ModelViewSet):
+    queryset = TodayTask.objects.all()
+    serializer_class = TodayTaskSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     
-            
-    def destroy(self, request, pk=None):
-        try:
-            done = self.get_object()
-            done.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Done.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    
+    def get_queryset(self):
+        return TodayTask.objects.filter(user=self.request.user)
 
-    
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
 
-    
-
-
-class UpdateTodoStatus(APIView):
-    def patch(self, request, todo_id):
-        try:
-            todo = Todo.objects.get(id=todo_id, user=request.user)
-        except Todo.DoesNotExist:
-            return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Status aktualisieren
-        serializer = TodoSerializer(todo, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-class UpdateInProgressStatus(APIView):
-    def patch(self, request, progress_id):
-        try:
-            progress = InProgress.objects.get(id=progress_id, user=request.user)
-        except InProgress.DoesNotExist:
-            return Response({"error": "InProgress task not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Status aktualisieren
-        serializer = InProgressSerializer(progress, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class UpdateDoneStatus(APIView):
-    def patch(self, request, done_id):
-        try:
-            done = Done.objects.get(id=done_id, user=request.user)
-        except Done.DoesNotExist:
-            return Response({"error": "Done task not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Status aktualisieren
-        serializer = DoneSerializer(done, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class UpdateTodayTaskStatus(APIView):
-    def patch(self, request, task_id):
-        try:
-            task = TodayTask.objects.get(id=task_id, user=request.user)
-        except TodayTask.DoesNotExist:
-            return Response({"error": "TodayTask not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Status aktualisieren
-        serializer = TodayTaskSerializer(task, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
-
-
-
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 
     
-class TodoDetailView(APIView):
-    def get_object(self, pk):
-        try:
-            return Todo.objects.get(pk=pk)
-        except Todo.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        todo = self.get_object(pk)
-        serializer = TodoSerializer(todo)
-        return Response(serializer.data)
-
-    def patch(self, request, pk, format=None):
-        todo = self.get_object(pk)
-        serializer = TodoSerializer(todo, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        todo = self.get_object(pk)
-        todo.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
-
-
-

@@ -1,24 +1,12 @@
-
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import InProgress, Todo, Contact, TodayTask,Done
-
-
 from .models import CustomUser
-#from .models import Todo
-
-
-
 
 class ContactSerializer(serializers.ModelSerializer):
-    #phoneNumber = serializers.CharField(source='phone_number')
     class Meta:
         model = Contact
         fields =  ['id', 'name', 'email', 'phoneNumber']
-
-
-
-
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password']
         )
-        user.is_staff = True  # Setzt den Staff-Status auf True
+        user.is_staff = True 
         user.save()
         return user
        
@@ -42,16 +30,8 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
     
-
-    
-#class LoginSerializer(serializers.Serializer):
-    #email = serializers.EmailField()
-    #password = serializers.CharField(write_only=True)
-    
 class TodoSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
-    #contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.all(), many=True, required=False)
-    
     class Meta:
         model = Todo
         fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
@@ -73,33 +53,19 @@ class TodoSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle the many-to-many relationship
         instance.contacts.clear()
         for contact_data in contacts_data:
             contact, created = Contact.objects.get_or_create(**contact_data)
             instance.contacts.add(contact)
         return instance
 
-   
-   
-    
-  
-    
-   
-    
-    
 
 class TodayTaskSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
-    
-   
     class Meta:
         model = TodayTask
         fields = ['id','text', 'delayed', 'description', 'user', 'contacts','status']
         read_only_fields = ['id','user']  
-
-        
-       
    
     def create(self, validated_data):
         contacts_data = validated_data.pop('contacts', [])
@@ -115,7 +81,6 @@ class TodayTaskSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle the many-to-many relationship
         instance.contacts.clear()
         for contact_data in contacts_data:
             contact, created = Contact.objects.get_or_create(**contact_data)
@@ -123,14 +88,11 @@ class TodayTaskSerializer(serializers.ModelSerializer):
         return instance
     
 
-        
 class InProgressSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
     class Meta:
         model = InProgress
         fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
-
-        
         read_only_fields = ['id','user']  
    
     def create(self, validated_data):
@@ -147,22 +109,17 @@ class InProgressSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle the many-to-many relationship
         instance.contacts.clear()
         for contact_data in contacts_data:
             contact, created = Contact.objects.get_or_create(**contact_data)
             instance.contacts.add(contact)
         return instance
     
-        
-        
 class DoneSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
     class Meta:
         model = Done
         fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
-
-        
         read_only_fields = ['id','user']  
    
     def create(self, validated_data):
@@ -172,31 +129,15 @@ class DoneSerializer(serializers.ModelSerializer):
             contact, created = Contact.objects.get_or_create(**contact_data)
             done.contacts.add(contact)
         return done
-
+    
     def update(self, instance, validated_data):
         contacts_data = validated_data.pop('contacts', [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle the many-to-many relationship
         instance.contacts.clear()
         for contact_data in contacts_data:
             contact, created = Contact.objects.get_or_create(**contact_data)
             instance.contacts.add(contact)
         return instance
-    
-        
-        
-        
-        
-        
-        
-       
-        
-        
-       
-        
-        
-        
-       
