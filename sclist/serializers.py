@@ -1,9 +1,14 @@
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import InProgress, Todo, Contact, TodayTask,Done
 
+
 from .models import CustomUser
 #from .models import Todo
+
+
+
 
 class ContactSerializer(serializers.ModelSerializer):
     #phoneNumber = serializers.CharField(source='phone_number')
@@ -42,15 +47,16 @@ class LoginSerializer(serializers.Serializer):
 #class LoginSerializer(serializers.Serializer):
     #email = serializers.EmailField()
     #password = serializers.CharField(write_only=True)
-
+    
 class TodoSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
+    #contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.all(), many=True, required=False)
+    
     class Meta:
         model = Todo
         fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
-
-        
-        read_only_fields = ['user']  
+    
+        read_only_fields = ['id','user']  
    
     def create(self, validated_data):
         contacts_data = validated_data.pop('contacts', [])
@@ -59,7 +65,8 @@ class TodoSerializer(serializers.ModelSerializer):
             contact, created = Contact.objects.get_or_create(**contact_data)
             todo.contacts.add(contact)
         return todo
-
+    
+    
     def update(self, instance, validated_data):
         contacts_data = validated_data.pop('contacts', [])
         for attr, value in validated_data.items():
@@ -72,19 +79,27 @@ class TodoSerializer(serializers.ModelSerializer):
             contact, created = Contact.objects.get_or_create(**contact_data)
             instance.contacts.add(contact)
         return instance
+
+   
+   
     
+  
     
+   
     
     
 
 class TodayTaskSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
+    
+   
     class Meta:
         model = TodayTask
-        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
+        fields = ['id','text', 'delayed', 'description', 'user', 'contacts','status']
+        read_only_fields = ['id','user']  
 
         
-        read_only_fields = ['user']  
+       
    
     def create(self, validated_data):
         contacts_data = validated_data.pop('contacts', [])
@@ -107,15 +122,16 @@ class TodayTaskSerializer(serializers.ModelSerializer):
             instance.contacts.add(contact)
         return instance
     
+
         
 class InProgressSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
     class Meta:
         model = InProgress
-        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts']
+        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
 
         
-        read_only_fields = ['user']  
+        read_only_fields = ['id','user']  
    
     def create(self, validated_data):
         contacts_data = validated_data.pop('contacts', [])
@@ -144,10 +160,10 @@ class DoneSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True)
     class Meta:
         model = Done
-        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts']
+        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','status']
 
         
-        read_only_fields = ['user']  
+        read_only_fields = ['id','user']  
    
     def create(self, validated_data):
         contacts_data = validated_data.pop('contacts', [])
@@ -173,8 +189,6 @@ class DoneSerializer(serializers.ModelSerializer):
         
         
         
-        
-       
         
         
         
