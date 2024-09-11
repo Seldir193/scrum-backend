@@ -75,7 +75,10 @@ class TaskViewSet(viewsets.ModelViewSet):
         instance.delete()
         
     def get_queryset(self):
-        queryset = Task.objects.all()
+        queryset = Task.objects.filter(user=self.request.user)
+        
+        
+       
         status = self.request.query_params.get('status', None)
         if status is not None:
             queryset = queryset.filter(status=status)
