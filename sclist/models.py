@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 class CustomUser(AbstractUser):
-    
     pass
 
 class Contact(models.Model):
@@ -12,11 +12,11 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
     
-class BaseTask(models.Model):
+class Task(models.Model):
     STATUS_CHOICES = [
         ('todos', 'To Do'),
         ('todaytasks', 'Today Tasks'),
-        ('inProgress', 'In Progress'),
+        ('inprogress', 'In Progress'),
         ('done', 'Done'),
     ]
 
@@ -26,27 +26,10 @@ class BaseTask(models.Model):
     contacts = models.ManyToManyField(Contact, blank=True)
     delayed = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='todos')
-
-    class Meta:
-        abstract = True
+    order = models.PositiveIntegerField(default=0)  # Für die Reihenfolge der Aufgaben
 
     def __str__(self):
-        return self.text
-
-class Todo(BaseTask):
-    order = models.PositiveIntegerField(default=0)
-
-class TodayTask(BaseTask):
-    pass
-
-class InProgress(BaseTask):
-    pass
-
-class Done(BaseTask):
-    pass
-
-
-
+        return f"{self.text} ({self.get_status_display()})"
 
 
 

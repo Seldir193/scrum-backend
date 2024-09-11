@@ -1,20 +1,15 @@
 from django.http import Http404
-from rest_framework import status 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate, login, logout
-from .serializers import RegisterSerializer, TodoSerializer, ContactSerializer,InProgressSerializer,DoneSerializer
+from .serializers import RegisterSerializer, TaskSerializer, ContactSerializer
 from rest_framework import viewsets
-from .models import  Todo ,Contact, TodayTask,InProgress,Done
+from .models import Task, Contact
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.views import LoginView as DjangoLoginView
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.decorators import action
-from .serializers import TodayTaskSerializer
-
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
@@ -35,6 +30,7 @@ class SignupView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -62,78 +58,29 @@ class ContactViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
 
-class TodoViewSet(viewsets.ModelViewSet):
+
+class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = Todo.objects.all()
-    serializer_class = TodoSerializer
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.delete()
         
     def get_queryset(self):
-        return Todo.objects.filter(user=self.request.user)
+        queryset = Task.objects.all()
+        status = self.request.query_params.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        return queryset
 
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.delete()
-    
-
-class InProgressViewSet(viewsets.ModelViewSet):
-    queryset = InProgress.objects.all()
-    serializer_class = InProgressSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
-    def get_queryset(self):
-        return InProgress.objects.filter(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.delete()
-
-class DoneViewSet(viewsets.ModelViewSet):
-    queryset = Done.objects.all()
-    serializer_class = DoneSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
-    def get_queryset(self):
-        return Done.objects.filter(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.delete()
-
-class TodayTaskViewSet(viewsets.ModelViewSet):
-    queryset = TodayTask.objects.all()
-    serializer_class = TodayTaskSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
-    def get_queryset(self):
-        return TodayTask.objects.filter(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.delete()
 
 
 
