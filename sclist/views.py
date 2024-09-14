@@ -1,8 +1,7 @@
-from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, logout
 from .serializers import RegisterSerializer, TaskSerializer, ContactSerializer
 from rest_framework import viewsets
 from .models import Task, Contact
@@ -78,7 +77,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = Task.objects.filter(user=self.request.user)
         
         
-       
+        #queryset = Task.objects.all()
         status = self.request.query_params.get('status', None)
         if status is not None:
             queryset = queryset.filter(status=status)

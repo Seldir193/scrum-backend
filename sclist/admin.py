@@ -15,7 +15,7 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'delayed', 'description', 'user', 'status')
+    list_display = ( 'text', 'delayed', 'description', 'user', 'status')
     search_fields = ('text', 'description', 'user__username')
     list_filter = ('delayed', 'status', 'user')
 
