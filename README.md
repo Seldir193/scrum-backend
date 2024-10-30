@@ -1,59 +1,79 @@
 # Scrum Backend Project
 
 ## Project Description
-Dieses Projekt ist ein Backend für ein Scrum-Management-System, das mit Django entwickelt wurde. Es ermöglicht die Verwaltung von Aufgaben, Kontakten und Benutzern innerhalb eines Scrum-Teams.
+This project is a Django REST API backend designed to manage tasks and contacts in a Scrum-like workflow system.
 
 ## Features
-- Benutzerregistrierung und -authentifizierung (mit CustomUser)
-- Verwaltung von Aufgaben mit Status (ToDo, In Progress, Done)
-- Zuweisung von Kontakten zu Aufgaben
-- Aufgabenreihenfolge festlegen und verzögerte Aufgaben markieren
+- User registration and authentication (JWT)
+- CRUD operations for tasks and contacts
+- Task filtering by status (To Do, In Progress, Done)
+- RESTful API with Django REST Framework
 
-## Installation
-
-### Voraussetzungen
+## Prerequisites
 - Python 3.x
 - Django
 - Git
 
-### Setup Schritte
-1. Klone das Repository:
+## Installation
+
+1. Clone the repository:
     ```bash
     git clone https://github.com/Seldir193/scrum-backend.git
     ```
 
-2. Wechsle ins Projektverzeichnis:
+2. Navigate into the project directory:
     ```bash
-    cd dein-repository
+    cd scrum-backend
     ```
 
-3. Erstelle und aktiviere ein virtuelles Environment:
+3. Create and activate a virtual environment:
     ```bash
     python -m venv venv
-    source venv/bin/activate  # Für Mac/Linux
-    .\venv\Scripts\activate   # Für Windows
+    source venv/bin/activate  # For Mac/Linux
+    .\venv\Scripts\activate   # For Windows
     ```
 
-4. Installiere die benötigten Pakete:
+4. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
-5. Führe die Datenbankmigrationen durch:
+5. Apply the database migrations:
     ```bash
     python manage.py migrate
     ```
 
-6. Starte den lokalen Server:
+6. Create a superuser:
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+7. Start the local server:
     ```bash
     python manage.py runserver
     ```
 
-## Usage
-Nachdem der Server gestartet wurde, kannst du auf das Admin-Panel unter `http://127.0.0.1:8000/admin/` zugreifen.
+## API Endpoints
 
-## Contribution
-Beiträge sind willkommen! Erstelle einen Fork des Projekts, führe Änderungen durch und erstelle einen Pull Request.
+### Authentication
+- **POST** `/login/`: Login and obtain JWT tokens.
+- **POST** `/register/`: Register a new user.
+- **POST** `/logout/`: Log out the current user.
 
-## License
-Dieses Projekt ist lizenziert unter der MIT License - siehe die [LICENSE](LICENSE) Datei für Details.
+### Tasks
+- **GET** `/api/tasks/`: Get a list of tasks.
+- **POST** `/api/tasks/`: Create a new task.
+- **PUT** `/api/tasks/<id>/`: Update a task.
+- **DELETE** `/api/tasks/<id>/`: Delete a task.
+
+## Running Tests
+
+Unit tests are available for the following areas:
+- **Task Model Tests**: Ensures that tasks are correctly created and updated.
+- **Contact Model Tests**: Tests related to contact creation and management.
+- **Task API Tests**: Verifies CRUD operations for tasks through the API.
+- **Authentication Tests**: Ensures login, registration, and logout functionalities work as expected.
+
+To run the tests, use the following command:
+```bash
+python manage.py test

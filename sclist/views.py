@@ -10,6 +10,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from .permissions import IsAdminOrReadOnly
+from rest_framework.authtoken.models import Token
+
 class SignupView(APIView):
     permission_classes = [AllowAny]
 
@@ -17,11 +20,21 @@ class SignupView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            
+            #user = serializer.save()
+            #user.is_superuser = True   # Macht den Benutzer zum Superuser
+            #user.is_staff = True       # Gibt Zugang zum Admin-Bereich
+            #user.save()
+            
+            
+            token, created = Token.objects.get_or_create(user=user)
             return Response({
                 'message': 'User registered successfully',
                 'data': {
+                     
                     'username': user.username,
                     'email': user.email,
+                    'token': token.key
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,28 +73,28 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = Task.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
     serializer_class = TaskSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.delete()
-        
     def get_queryset(self):
+        # Zeigt nur die Aufgaben des aktuellen Benutzers an und filtert optional nach Status
         queryset = Task.objects.filter(user=self.request.user)
-        
-        
-        #queryset = Task.objects.all()
         status = self.request.query_params.get('status', None)
         if status is not None:
             queryset = queryset.filter(status=status)
         return queryset
+
+    def perform_create(self, serializer):
+        # Setzt den aktuellen Benutzer als Eigentümer der Aufgabe
+        serializer.save(user=self.request.user)
+
+
+
+
+
+    
+
+
 
 
 
