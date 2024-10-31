@@ -56,9 +56,11 @@ This project is a Django REST API backend designed to manage tasks and contacts 
 ## API Endpoints
 
 ### Authentication
-- **POST** `/login/`: Login and obtain JWT tokens.
-- **POST** `/register/`: Register a new user.
-- **POST** `/logout/`: Log out the current user.
+- **POST** `/api/login/`: Login and obtain JWT tokens.
+- **POST** `/api/register/`: Register a new user.
+- **POST** `/api/logout/`: Log out the current user.
+- **POST** `/api/token/`: Obtain JWT token.
+- **POST** `/api/token/refresh/`: Refresh JWT token.
 
 ### Tasks
 - **GET** `/api/tasks/`: Get a list of tasks.
