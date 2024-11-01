@@ -10,7 +10,44 @@ from .serializers import RegisterSerializer, TaskSerializer, ContactSerializer
 from .models import Task, Contact
 from .permissions import IsAdminOrReadOnly
 from .utils import create_token_for_user, generate_jwt_tokens, authenticate_user
+from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
+import random
 
+
+def create_unique_guest_user():
+    """Creates a unique guest user with a random username."""
+    CustomUser = get_user_model()
+    while True:
+        random_id = random.randint(1000, 9999)
+        guest_username = f"guest_{random_id}"
+        if not CustomUser.objects.filter(username=guest_username).exists():
+            break
+    
+    # Create the guest user with a unique username
+    guest_user = CustomUser.objects.create_user(username=guest_username, password="guestpassword")
+    guest_user.is_staff = False  # Optional: set permissions as needed
+    guest_user.save()
+
+    # Create and return an authentication token for the guest user
+    token, _ = Token.objects.get_or_create(user=guest_user)
+    return guest_user, token
+
+class GuestLoginView(APIView):
+    """Logs in as a unique guest user and returns JWT tokens."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # Create a unique guest user
+        guest_user, token = create_unique_guest_user()
+        refresh_token, access_token = generate_jwt_tokens(guest_user)
+        
+        return Response({
+            'username': guest_user.username,
+            'refresh': refresh_token,
+            'access': access_token,
+            'token': token.key,
+        })
 
 class SignupView(APIView):
     """Creates a new user and returns an authentication token."""
@@ -64,7 +101,18 @@ class ContactViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
+    
+    def get_queryset(self):
+        """
+        Returns only the contacts that belong to the authenticated user.
+        """
+        return Contact.objects.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+       """
+       Set the current user as the owner of the contact.
+       """
+       serializer.save(user=self.request.user)
 
 class TaskViewSet(viewsets.ModelViewSet):
     """Provides CRUD functionality for tasks, restricted to the logged-in user."""
@@ -83,3 +131,4 @@ class TaskViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Assigns the current user as the task owner."""
         serializer.save(user=self.request.user)
+

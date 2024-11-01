@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import CustomUser, Contact, Task
+from rest_framework.authtoken.models import Token
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -7,8 +8,8 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'email', 'is_staff', 'is_active')
     search_fields = ('username', 'email')
     list_filter = ('is_staff', 'is_active')
-
-
+    
+   
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
     """Admin configuration for Contact model."""

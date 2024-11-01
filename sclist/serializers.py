@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 from .models import Task, Contact, CustomUser
 from .utils import create_token_for_user, generate_jwt_tokens, authenticate_user
@@ -10,6 +11,10 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = ['id', 'name', 'email', 'phone_number']
 
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user  # Benutzer aus Anfrage setzen
+        return super().create(validated_data)
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration with required fields for creating a new user."""
@@ -20,6 +25,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+        
+    def validate_email(self, value):
+        """Ensure the email is unique."""
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Diese E-Mail-Adresse wird bereits verwendet.")
+        return value
 
     def create(self, validated_data):
         """Creates a new user with superuser and staff permissions."""
@@ -67,9 +78,20 @@ class TaskSerializer(serializers.ModelSerializer):
         instance.contacts.clear()
         self.add_contacts_to_task(instance, contacts_data)
         return instance
-
+    
     def add_contacts_to_task(self, task, contacts_data):
-        """Helper method to add contacts to a task."""
+        """Helper method to add contacts to a task, scoped to the user's contacts."""
         for contact_data in contacts_data:
-            contact, created = Contact.objects.get_or_create(**contact_data)
+            # Benutzer hinzufügen, um sicherzustellen, dass der Kontakt eindeutig für den Benutzer ist
+            contact, created = Contact.objects.get_or_create(
+                user=task.user,  # Benutzer festlegen
+                **contact_data
+            )
             task.contacts.add(contact)
+
+
+
+
+
+
+    

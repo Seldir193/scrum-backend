@@ -2,8 +2,8 @@ from rest_framework import permissions
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
-    Allows delete and update permissions only to superusers and staff.
-    Authenticated users have read access.
+    Custom permission class that allows only admin, staff, and guest users to delete or update tasks.
+    Normal users can only create or read tasks.
     """
     
     def has_permission(self, request, view):
@@ -17,11 +17,9 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         Returns:
             bool: Permission status.
         """
-        # Restrict delete and update actions to superusers and staff
+        # Allow only superusers, staff, and guest users to delete or update tasks
         if view.action in ['destroy', 'update']:
-            return request.user.is_superuser or request.user.is_staff
-
-        # Allow read actions for authenticated users
+            return request.user.is_superuser or request.user.is_staff or request.user.username == "guest"
+        
+        # Other actions (create, read) are allowed for all authenticated users
         return request.user.is_authenticated
-
-

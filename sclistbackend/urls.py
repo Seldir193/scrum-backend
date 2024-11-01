@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from sclist.views import TaskViewSet, ContactViewSet, logout_view, LoginView, SignupView
+from sclist.views import TaskViewSet, ContactViewSet, logout_view, LoginView, SignupView, GuestLoginView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/login/', LoginView.as_view(), name='login'),  # User login
     path('api/logout/', logout_view, name='logout'),  # User logout
     path('api/register/', SignupView.as_view(), name='register'),  # User registration
+    path('api/guest-login/', GuestLoginView.as_view(), name='guest_login'),
     
     # JWT token management
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Token request
