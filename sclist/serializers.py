@@ -56,10 +56,14 @@ class TaskSerializer(serializers.ModelSerializer):
     """Serializer for Task model including associated contacts for task creation and update."""
     
     contacts = ContactSerializer(many=True)
+    
+    due_date = serializers.DateField(required=False, allow_null=True)
+   
+    
 
     class Meta:
         model = Task
-        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts', 'status']
+        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts', 'status','priority','due_date']
         read_only_fields = ['id', 'user']
 
     def create(self, validated_data):

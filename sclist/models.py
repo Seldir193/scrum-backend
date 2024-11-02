@@ -50,6 +50,13 @@ class Task(models.Model):
         ('inprogress', 'In Progress'),
         ('done', 'Done'),
     ]
+    
+    PRIORITY_CHOICES = [
+        ('urgent', 'Urgent'),
+        ('medium', 'Medium'),
+        ('low', 'Low'),
+    ]
+
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
@@ -58,6 +65,9 @@ class Task(models.Model):
     delayed = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='todos')
     order = models.PositiveIntegerField(default=0)  # Position for ordering
+    created_at = models.DateTimeField(auto_now_add=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    due_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         """Returns the task's title and status."""

@@ -13,6 +13,8 @@ from .utils import create_token_for_user, generate_jwt_tokens, authenticate_user
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 import random
+from django.utils.timezone import now
+from django.db.models import Count
 
 
 def create_unique_guest_user():
@@ -95,6 +97,52 @@ def logout_view(request):
     return Response({'message': 'Logout successful'}, status=200)
 
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def task_summary(request):
+    """Returns task summary information."""
+    user = request.user
+
+    # 1. Last task creation date
+    last_task = Task.objects.filter(user=user).order_by('-id').first()
+    last_task_date = last_task.created_at if last_task else None
+
+    # 2. Total task count
+    total_tasks = Task.objects.filter(user=user).count()
+
+    # 3/4/5/6. Count of tasks by status
+    task_status_counts = Task.objects.filter(user=user).values('status').annotate(count=Count('id'))
+    
+    # Organize counts by status in a dictionary
+    status_count_dict = {
+        "todos": 0,
+        "todaytasks": 0,
+        "inprogress": 0,
+        "done": 0
+    }
+    
+    # Populate the dictionary with counts
+    for item in task_status_counts:
+        status_count_dict[item['status']] = item['count']
+
+    # Combine all data into a single response
+    data = {
+        "last_task_date": last_task_date,
+        "total_tasks": total_tasks,
+        "status_counts": status_count_dict
+    }
+    
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    """Returns the current user's information."""
+    user = request.user
+    return Response({'username': user.username})
+
+
 class ContactViewSet(viewsets.ModelViewSet):
     """Provides CRUD functionality for contacts."""
     authentication_classes = [JWTAuthentication]
@@ -131,4 +179,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Assigns the current user as the task owner."""
         serializer.save(user=self.request.user)
+        
+   
+
 
