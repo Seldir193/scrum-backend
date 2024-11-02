@@ -63,7 +63,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts', 'status','priority','due_date']
+        fields = ['id', 'text', 'delayed', 'description', 'user', 'contacts','category', 'status','priority','due_date']
         read_only_fields = ['id', 'user']
 
     def create(self, validated_data):

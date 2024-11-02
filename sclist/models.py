@@ -56,6 +56,11 @@ class Task(models.Model):
         ('medium', 'Medium'),
         ('low', 'Low'),
     ]
+    
+    CATEGORY_CHOICES = [
+        ('Technical Tasks', 'Technical Tasks'),
+        ('User Story', 'User Story')
+    ]
 
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -68,6 +73,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     due_date = models.DateField(null=True, blank=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Technical Tasks')
 
     def __str__(self):
         """Returns the task's title and status."""
