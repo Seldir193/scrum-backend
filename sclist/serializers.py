@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 from .models import Task, Contact, CustomUser
 from .utils import create_token_for_user, generate_jwt_tokens, authenticate_user
